@@ -3,3 +3,4 @@ tags
 cscope*
 Dockerfile
 **/supervisord.conf
+dshare

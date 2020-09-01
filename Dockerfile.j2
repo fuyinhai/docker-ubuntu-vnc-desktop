@@ -3,6 +3,7 @@
 ################################################################################
 # base system
 ################################################################################
+
 {%if arch == "amd64"%}
 FROM {{image}} as system
 {%elif arch == "armhf"%}
@@ -14,6 +15,10 @@ COPY --from=amd64 /usr/bin/qemu-arm-static /usr/bin/
 {%endif%}
 
 COPY sources.list /etc/apt/sources.list
+{%if desktop == "gnome" %}
+COPY sources.list.kylin /etc/apt/sources.list
+{%endif%}
+
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
 
 #Chinese support
@@ -58,7 +63,7 @@ RUN apt update \
 RUN apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
         xvfb x11vnc \
-        {%if desktop == "gnome" %}vim-tiny xfce4-terminal{%endif%} {%if desktop == "kylin" %}vim-tiny{%endif%} {%if desktop == "lxde" %}vim-tiny ttf-ubuntu-font-family ttf-wqy-zenhei{%endif%} {%if desktop == "lxqt" %}vim-tiny ttf-ubuntu-font-family ttf-wqy-zenhei openbox{%endif%} {%if desktop == "xfce4" %}vim-tiny xfce4-terminal{%endif%}
+        {%if desktop == "gnome" %}vim-tiny xfce4-terminal{%endif%} {%if desktop == "lxde" %}vim-tiny ttf-ubuntu-font-family ttf-wqy-zenhei{%endif%} {%if desktop == "lxqt" %}vim-tiny ttf-ubuntu-font-family ttf-wqy-zenhei openbox{%endif%} {%if desktop == "xfce4" %}vim-tiny xfce4-terminal{%endif%} curl
 
 COPY rootfs /
 
@@ -91,7 +96,7 @@ RUN apt update \
 RUN apt-get update \
     && dpkg-query -W -f='${Package}\n' > /tmp/a.txt \
     && apt-get install -y python3-pip python3-dev build-essential \
-    && pip3 install setuptools wheel && pip3  install -r /usr/local/lib/web/backend/requirements.txt \
+    && pip3 install setuptools wheel --trusted-host mirrors.aliyun.com && pip3  install -r /usr/local/lib/web/backend/requirements.txt --trusted-host mirrors.aliyun.com \
     && ln -s /usr/bin/python3 /usr/local/bin/python \
     && dpkg-query -W -f='${Package}\n' > /tmp/b.txt \
     && apt-get remove -y `diff --changed-group-format='%>' --unchanged-group-format='' /tmp/a.txt /tmp/b.txt | xargs` \
