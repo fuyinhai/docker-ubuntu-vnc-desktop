@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ -n "$VNC_PASSWORD" ]; then
-    echo -n "$VNC_PASSWORD" > /.password1
+if [ -n "$PASSWORD" ]; then
+    echo -n "$PASSWORD" > /.password1
     x11vnc -storepasswd $(cat /.password1) /.password2
     chmod 400 /.password*
     sed -i 's/^command=x11vnc.*/& -rfbauth \/.password2/' /etc/supervisor/conf.d/supervisord.conf
-    export VNC_PASSWORD=
+    export PASSWORD=
 fi
 
 if [ -n "$X11VNC_ARGS" ]; then
@@ -20,8 +20,8 @@ if [ -n "$RESOLUTION" ]; then
     sed -i "s/1024x768/$RESOLUTION/" /usr/local/bin/xvfb.sh
 fi
 
-USER=${USER:-root}
-HOME=/root
+USER=${USERNAME:-root}
+HOME=${HOME:-/root}
 if [ "$USER" != "root" ]; then
     echo "* enable custom user: $USER"
     useradd --create-home --shell /bin/bash --user-group --groups adm,sudo $USER
@@ -29,7 +29,6 @@ if [ "$USER" != "root" ]; then
         echo "  set default password to \"ubuntu\""
         PASSWORD=ubuntu
     fi
-    HOME=/home/$USER
     echo "$USER:$PASSWORD" | chpasswd
     cp -r /root/{.config,.gtkrc-2.0,.asoundrc} ${HOME}
     mkdir -p ${HOME}/.vnc

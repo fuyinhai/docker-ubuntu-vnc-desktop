@@ -24,18 +24,20 @@ build: $(templates) Dockerfile.j2 Makefile
 # Test run the container
 # the local dir will be mounted under /src read-only
 run:
-	docker run --privileged --rm \
-		-p 6080:80 -p 6081:443 \
+	docker run --privileged --rm -it \
+		-p 6080:8080 -p 6081:443 \
 		-v ${PWD}:/src:ro \
-		-e USER=ubuntu -e PASSWORD=password123 \
+		-e USERNAME=ubuntu -e PASSWORD=password123 -e HOME=/usr/local/share\
 		-e ALSADEV=hw:2,0 \
 		-e SSL_PORT=443 \
 		-e RELATIVE_URL_ROOT=approot \
 		-e OPENBOX_ARGS="--startup /usr/bin/galculator" \
 		-v ${PWD}/ssl:/etc/nginx/ssl \
+		-v ${PWD}/share:/usr/local/share \
 		--device /dev/snd \
 		--name $(REPO)-$(TAG) \
-		$(REPO):$(TAG)
+		$(REPO):$(TAG) \
+		/usr/local/start ubuntu-100-demo
 
 # Connect inside the running container for debugging
 shell:
