@@ -1,21 +1,24 @@
-.PHONY: build run
+.PHONY: build-web build run
 
 # Default values for variables
-REPO  ?= dorowu/ubuntu-desktop-lxde-vnc
-TAG   ?= latest
+REPO  ?= ubuntu
+TAG   ?= ${TAG}
 # you can choose other base image versions
-IMAGE ?= ubuntu:20.04
+IMAGE ?= ubuntu:18.04
 # IMAGE ?= nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 # choose from supported flavors (see available ones in ./flavors/*.yml)
-FLAVOR ?= lxde
+FLAVOR ?= $(TAG)
 # armhf or amd64
 ARCH ?= amd64
 
 # These files will be generated from teh Jinja templates (.j2 sources)
 templates = Dockerfile rootfs/etc/supervisor/conf.d/supervisord.conf
 
-# Rebuild the container image
-build: $(templates)
+build-web: Dockerfile-web
+	docker build -t $(REPO):$(TAG)-web -f Dockerfile-web .
+	docker run -v $(shell pwd):/usr/local/share $(REPO):$(TAG)-web cp /usr/local/lib/web/frontend/* /usr/local/share/rootfs/usr/local/lib/web/frontend -R
+
+build: $(templates) Dockerfile.j2 Makefile
 	docker build -t $(REPO):$(TAG) .
 
 # Test run the container
@@ -24,19 +27,19 @@ run:
 	docker run --privileged --rm \
 		-p 6080:80 -p 6081:443 \
 		-v ${PWD}:/src:ro \
-		-e USER=doro -e PASSWORD=mypassword \
+		-e USER=ubuntu -e PASSWORD=password123 \
 		-e ALSADEV=hw:2,0 \
 		-e SSL_PORT=443 \
 		-e RELATIVE_URL_ROOT=approot \
 		-e OPENBOX_ARGS="--startup /usr/bin/galculator" \
 		-v ${PWD}/ssl:/etc/nginx/ssl \
 		--device /dev/snd \
-		--name ubuntu-desktop-lxde-test \
+		--name $(REPO)-$(TAG) \
 		$(REPO):$(TAG)
 
 # Connect inside the running container for debugging
 shell:
-	docker exec -it ubuntu-desktop-lxde-test bash
+	docker exec -it $(REPO)-$(TAG) bash
 
 # Generate the SSL/TLS config for HTTPS
 gen-ssl:
@@ -52,7 +55,7 @@ extra-clean:
 	docker image prune -f
 
 # Run jinja2cli to parse Jinja template applying rules defined in the flavors definitions
-%: %.j2 flavors/$(FLAVOR).yml
+%: %.j2 flavors/$(FLAVOR).yml Dockerfile.j2 Makefile
 	docker run -v $(shell pwd):/data vikingco/jinja2cli \
 		-D flavor=$(FLAVOR) \
 		-D image=$(IMAGE) \

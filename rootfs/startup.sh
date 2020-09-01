@@ -32,7 +32,15 @@ if [ "$USER" != "root" ]; then
     HOME=/home/$USER
     echo "$USER:$PASSWORD" | chpasswd
     cp -r /root/{.config,.gtkrc-2.0,.asoundrc} ${HOME}
+    mkdir -p ${HOME}/.vnc
+    mkdir -p ${HOME}/Desktop
+    mkdir -p ${HOME}/Documents
+    mkdir -p ${HOME}/Trash
+    x11vnc -storepasswd ${PASSWORD} ${HOME}/.vnc/passwd
+    cp /root/.vnc/xstartup ${HOME}/.vnc
     chown -R $USER:$USER ${HOME}
+    chmod a+x ${HOME}/.vnc/xstartup
+    ls -lart ${HOME}
     [ -d "/dev/snd" ] && chgrp -R adm /dev/snd
 fi
 sed -i -e "s|%USER%|$USER|" -e "s|%HOME%|$HOME|" /etc/supervisor/conf.d/supervisord.conf
