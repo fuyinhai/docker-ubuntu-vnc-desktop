@@ -33,7 +33,6 @@ run:
 		-e RELATIVE_URL_ROOT=approot \
 		-e OPENBOX_ARGS="--startup /usr/bin/galculator" \
 		-v ${PWD}/ssl:/etc/nginx/ssl \
-		-v ${PWD}/share:/usr/local/share \
 		--device /dev/snd \
 		--name $(REPO)-$(TAG) \
 		$(REPO):$(TAG) \

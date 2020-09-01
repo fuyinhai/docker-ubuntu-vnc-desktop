@@ -12,3 +12,12 @@ pwd
 ls /root
 ls
 pwd
+pwd
+ls
+pwd
+whoami
+ls /
+ls /home
+ls /ubuntu
+ls /home/ubuntu/
+ls /home/ubuntu/ -la
