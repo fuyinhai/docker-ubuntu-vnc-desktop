@@ -37,8 +37,7 @@ run:
 		-v ${PWD}/dshare:/usr/local/share \
 		--device /dev/snd \
 		--name $(REPO)-$(TAG) \
-		$(REPO):$(TAG) \
-		/usr/local/start ubuntu-100-demo
+		$(REPO):$(TAG)
 
 # Connect inside the running container for debugging
 shell:

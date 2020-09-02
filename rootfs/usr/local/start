@@ -3,3 +3,5 @@ set -eu
 
 /usr/bin/curl http://admin.lab/lab/pvz/$1
 
+/startup.sh
+
