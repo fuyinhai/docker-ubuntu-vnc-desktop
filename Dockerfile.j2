@@ -14,14 +14,16 @@ FROM arm32v7/{{image}} as system
 COPY --from=amd64 /usr/bin/qemu-arm-static /usr/bin/
 {%endif%}
 
-COPY sources.list /etc/apt/sources.list
-{%if desktop == "gnome" %}
+{%if desktop == "kylin" %}
 COPY sources.list.kylin /etc/apt/sources.list
+{%else%}
+COPY sources.list /etc/apt/sources.list
 {%endif%}
 
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
 
-#Chinese support
+{%if desktop == "kylin" %}
+{%else%}
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     apt-get update -q && \
     apt-get install -y --no-install-recommends tzdata
@@ -45,6 +47,7 @@ RUN apt install language-pack-zh-hans fonts-droid-fallback ttf-wqy-zenhei ttf-wq
     && echo 'zh_CN.UTF-8 UTF-8' > /var/lib/locales/supported.d/local \
     && echo 'zh_CN.GBK GBK' > /var/lib/locales/supported.d/local \
     && echo 'zh_CN GB2312' > /var/lib/locales/supported.d/local
+{%endif%}
 
 # built-in packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -71,13 +74,17 @@ RUN apt update \
     && apt install -y gpg-agent \
     && (dpkg -i /chrome.deb || apt-get install -fy)
 
+{%if desktop == "kylin" %}
+{%else%}
+RUN apt update
+RUN apt  install -y --no-install-recommends --allow-unauthenticated gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf arc-theme
+{%endif%}
+
 RUN apt update \
-    && apt install -y --no-install-recommends --allow-unauthenticated {%if desktop == "lxde" %}lxde{%endif%} {%if desktop == "lxqt" %}lxqt{%endif%} {%if desktop == "xfce4" %}xfce4{%endif%} gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf arc-theme \
+    && apt install -y --no-install-recommends --allow-unauthenticated {%if desktop == "lxde" %}lxde{%endif%} {%if desktop == "lxqt" %}lxqt{%endif%} {%if desktop == "xfce4" %}xfce4{%endif%} curl \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-# Additional packages require ~600MB
-# libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
 
 # tini to fix subreap
 ARG TINI_VERSION=v0.18.0
