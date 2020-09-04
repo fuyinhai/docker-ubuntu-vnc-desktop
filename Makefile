@@ -26,7 +26,7 @@ build: $(templates) Dockerfile.j2 Makefile
 run:
 	docker run --privileged --rm -it \
 		-p 6080:8080 -p 6081:443 \
-		-v ${PWD}:/src:ro \
+		-v ${PWD}:/src \
 		-e USERNAME=ubuntu -e PASSWORD=password123 -e HOME=/usr/local/share\
 		-e ALSADEV=hw:2,0 \
 		-e SSL_PORT=443 \
