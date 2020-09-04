@@ -5,7 +5,6 @@ if [ -n "$PASSWORD" ]; then
     x11vnc -storepasswd $(cat /.password1) /.password2
     chmod 400 /.password*
     sed -i 's/^command=x11vnc.*/& -rfbauth \/.password2/' /etc/supervisor/conf.d/supervisord.conf
-    export PASSWORD=
 fi
 
 if [ -n "$X11VNC_ARGS" ]; then

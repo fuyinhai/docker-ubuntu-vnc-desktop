@@ -14,11 +14,7 @@ FROM arm32v7/{{image}} as system
 COPY --from=amd64 /usr/bin/qemu-arm-static /usr/bin/
 {%endif%}
 
-{%if desktop == "kylin" %}
-COPY sources.list.kylin /etc/apt/sources.list
-{%else%}
 COPY sources.list /etc/apt/sources.list
-{%endif%}
 
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
 
@@ -77,7 +73,7 @@ RUN apt update \
 {%if desktop == "kylin" %}
 {%else%}
 RUN apt update
-RUN apt  install -y --no-install-recommends --allow-unauthenticated gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf arc-theme
+RUN apt  install -y --no-install-recommends --allow-unauthenticated gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf arc-theme mate-indicator-applet
 {%endif%}
 
 RUN apt update \

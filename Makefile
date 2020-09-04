@@ -24,7 +24,6 @@ build: $(templates) Dockerfile.j2 Makefile
 # Test run the container
 # the local dir will be mounted under /src read-only
 run:
-	rm share/* -rf
 	docker run --privileged --rm -it \
 		-p 6080:8080 -p 6081:443 \
 		-v ${PWD}:/src:ro \
@@ -34,9 +33,8 @@ run:
 		-e RELATIVE_URL_ROOT=approot \
 		-e OPENBOX_ARGS="--startup /usr/bin/galculator" \
 		-v ${PWD}/ssl:/etc/nginx/ssl \
-		-v ${PWD}/dshare:/usr/local/share \
 		--device /dev/snd \
-		--name $(REPO)-$(TAG) \
+		--name $(TAG) \
 		$(REPO):$(TAG)
 
 # Connect inside the running container for debugging
