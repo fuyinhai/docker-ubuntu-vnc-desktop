@@ -14,10 +14,12 @@ FROM arm32v7/{{image}} as system
 COPY --from=amd64 /usr/bin/qemu-arm-static /usr/bin/
 {%endif%}
 
-{%if TAG == "kylin" %}
+{%if desktop == "kylin" %}
 
 {%else%}
+
 COPY sources.list /etc/apt/sources.list
+
 {%endif%}
 
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
