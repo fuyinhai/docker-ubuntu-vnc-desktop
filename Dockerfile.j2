@@ -24,8 +24,6 @@ COPY sources.list /etc/apt/sources.list
 
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
 
-{%if desktop == "kylin" %}
-{%else%}
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     apt-get update -q && \
     apt-get install -y --no-install-recommends tzdata
@@ -49,7 +47,6 @@ RUN apt install language-pack-zh-hans fonts-droid-fallback ttf-wqy-zenhei ttf-wq
     && echo 'zh_CN.UTF-8 UTF-8' > /var/lib/locales/supported.d/local \
     && echo 'zh_CN.GBK GBK' > /var/lib/locales/supported.d/local \
     && echo 'zh_CN GB2312' > /var/lib/locales/supported.d/local
-{%endif%}
 
 # built-in packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -105,7 +102,8 @@ RUN apt update \
 RUN apt-get update \
     && dpkg-query -W -f='${Package}\n' > /tmp/a.txt \
     && apt-get install -y python3-pip python3-dev build-essential \
-    && pip3 install setuptools wheel --trusted-host mirrors.aliyun.com && pip3  install -r /usr/local/lib/web/backend/requirements.txt --trusted-host mirrors.aliyun.com \
+    && pip3 install setuptools wheel --trusted-host mirrors.aliyun.com \
+    && pip3  install -r /usr/local/lib/web/backend/requirements.{%if desktop == "kylin"%}kylin{%else%}txt{%endif%} --trusted-host mirrors.aliyun.com \
     && ln -s /usr/bin/python3 /usr/local/bin/python \
     && dpkg-query -W -f='${Package}\n' > /tmp/b.txt \
     && apt-get remove -y `diff --changed-group-format='%>' --unchanged-group-format='' /tmp/a.txt /tmp/b.txt | xargs` \
