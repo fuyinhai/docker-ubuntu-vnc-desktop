@@ -24,6 +24,10 @@ COPY sources.list /etc/apt/sources.list
 
 RUN dpkg-divert --local --rename --add /sbin/initctl && ln -sf /bin/true /sbin/initctl
 
+{%if desktop == "kylin" %}
+RUN mkdir /var/run -p
+RUN mkdir /run
+{%endif%}
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     apt-get update -q && \
     apt-get install -y --no-install-recommends tzdata
