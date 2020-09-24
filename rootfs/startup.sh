@@ -78,6 +78,4 @@ fi
 PASSWORD=
 HTTP_PASSWORD=
 
-/usr/bin/curl http://admin.lab/lab/pvz/$LAB_NAME
-
 exec /bin/tini -- supervisord -n -c /etc/supervisor/supervisord.conf
